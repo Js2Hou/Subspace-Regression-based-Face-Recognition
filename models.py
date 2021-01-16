@@ -1,6 +1,9 @@
 import cmath
 import math
+
 import numpy as np
+
+from data_loader import DataLoader
 
 
 class LRClassifier:
@@ -59,36 +62,37 @@ class RRClassifier:
     def __init__(self, m, lamb=0.5):
         self.m = m
         self.lamb = lamb
-        self.w = None
-        self.T = self.data_prepare(RRClassifier.get_regular_simplex_vertices(self.m))
+        self.coeff_ = None
+        self.T = self.prepare_data(RRClassifier.get_regular_simplex_vertices(self.m))
 
-    def data_prepare(self, X):
+    def prepare_data(self, X):
         return X
 
     def fit(self, X, Y):
-        X = self.data_prepare(X)
-        Y = self.T[Y]
-        w = np.linalg.inv(X.T @ X + self.lamb * np.eye(X.shape[1])) @ X.T @ Y
-        self.w = w
+        X = self.prepare_data(X)
+        Yt = self.T[Y]
+        self.coeff_ = np.linalg.inv(X.T @ X + self.lamb * np.eye(X.shape[1])) @ X.T @ Yt
 
-    def evaluate(self, X, Y):
-        X = self.data_prepare(X)
+    def predict(self, X):
+        X = self.prepare_data(X)
         T = self.T
-        n = X.shape[0]
-        X_regular = X @ self.w
-
-        count_right = 0
-        for x_regular, y_true in zip(X_regular, Y):
+        Yt_hat = X @ self.coeff_
+        Y_hat = []
+        for yt_hat in Yt_hat:
             min_distance = 1e10
             y_pred = -1
             for id, t in enumerate(T):
-                distance = np.linalg.norm(x_regular - t)
+                distance = np.linalg.norm(yt_hat - t)
                 if distance < min_distance:
                     min_distance = distance
                     y_pred = id
-            if y_true == y_pred:
-                count_right += 1
-        acc = count_right / n
+            Y_hat.append(y_pred)
+        return np.array(Y_hat)
+
+    def evaluate(self, X, Y):
+        Y_hat = self.predict(X)
+        n_false = np.count_nonzero(Y - Y_hat)
+        acc = 1 - n_false / max(Y.shape)
         return acc
 
     @staticmethod
@@ -106,14 +110,27 @@ class RRClassifier:
 
 
 class ERRClassifier(RRClassifier):
-    def __init__(self, alpha, m):
+    def __init__(self, m, lamb=0.5, alpha=0.9):
         self.alpha = alpha
-        super().__init__(m)
+        super().__init__(lamb=lamb, m=m)
 
-    def data_prepare(self, X):
+    def prepare_data(self, X):
         return self.euler(X)
 
     def euler(self, x):
         alpha = self.alpha
         z = (cmath.e ** (1j * alpha * math.pi * x)) / math.sqrt(2)
         return z
+
+
+if __name__ == '__main__':
+    # 导入数据
+    train_x, train_y, test_x, test_y = DataLoader.load_AR(mode='1')
+    lamb = 0.5
+    model = RRClassifier(lamb=lamb, m=120)
+    model.fit(train_x, train_y)
+    train_y_hat = model.predict(train_x)
+    test_y_hat = model.predict(test_x)
+    print(train_y_hat[:20])
+    print(test_y_hat[:20])
+    print(f'acc: {model.evaluate(train_x, train_y)}')

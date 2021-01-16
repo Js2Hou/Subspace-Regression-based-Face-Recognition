@@ -1,7 +1,7 @@
 import time
 
 from data_loader import DataLoader
-from models import *
+from models import ERRClassifier, LRClassifier, RRClassifier
 
 
 def timer(func):
@@ -29,27 +29,24 @@ def evaluate_on_AR():
     # 线性回归分类器
     model1 = LRClassifier(train_data)
     acc = model1.evaluate(test_data)
-
+    cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
     with open(r'./results/a.txt', 'a+') as f:
-        cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         f.write(f'{cur_time} LRC-AR: {acc}\n')
 
     # 岭回归分类器
-    model2 = RRClassifier(m=120)
+    model2 = RRClassifier(lamb=0.5, m=120)
     model2.fit(train_x, train_y)
     acc2 = model2.evaluate(test_x, test_y)
-
+    cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
     with open(r'./results/a.txt', 'a+') as f:
-        cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         f.write(f'{cur_time} RRC-AR: {acc2}\n')
 
     # 欧拉岭回归分类器
-    model3 = ERRClassifier(alpha=0.9, m=120)
+    model3 = ERRClassifier(lamb=0.5, alpha=0.9, m=120)
     model3.fit(train_x, train_y)
     acc3 = model3.evaluate(test_x, test_y)
-
+    cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
     with open(r'./results/a.txt', 'a+') as f:
-        cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         f.write(f'{cur_time} ERRC-AR: {acc3}\n')
 
 
@@ -57,32 +54,44 @@ def evaluate_on_AR():
 def evaluate_on_ExtYaleB():
     dataset_xy = DataLoader.load_ExtYaleB(mode=1)
     train_x, train_y = dataset_xy[0]
-
     dataset = DataLoader.load_ExtYaleB(mode=2)
+
     # 线性回归分类器
     model1 = LRClassifier(dataset[0])
     for i in range(1, 5):
         acc = model1.evaluate(dataset[i])
+        cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         with open(r'./results/a.txt', 'a+') as f:
-            cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
             f.write(f'{cur_time} LRC-ExtYaleB(condition {i}): {acc}\n')
 
     # 岭回归分类器
-    model2 = RRClassifier(m=38)
+    model2 = RRClassifier(lamb=0.5, m=38)
     model2.fit(train_x, train_y)
     for i in range(1, 5):
         test_x, test_y = dataset_xy[i]
         acc2 = model2.evaluate(test_x, test_y)
+        cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         with open(r'./results/a.txt', 'a+') as f:
-            cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
             f.write(f'{cur_time} RRC-ExtYaleB(condition {i}): {acc2}\n')
 
     # 欧拉岭回归分类器
-    model3 = ERRClassifier(alpha=0.9, m=38)
+    model3 = ERRClassifier(lamb=0.5, alpha=0.9, m=38)
     model3.fit(train_x, train_y)
     for i in range(1, 5):
         test_x, test_y = dataset_xy[i]
         acc3 = model3.evaluate(test_x, test_y)
+        cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         with open(r'./results/a.txt', 'a+') as f:
-            cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
             f.write(f'{cur_time} ERRC-ExtYaleB(condition {i}): {acc3}\n')
+
+
+def test2():
+    # 导入数据
+    train_x, train_y, test_x, test_y = DataLoader.load_AR(mode='1')
+    lambs = [i / 10 for i in range(11)]
+    # 岭回归分类器
+    for lamb in lambs:
+        model = RRClassifier(lamb=lamb, m=120)
+        model.fit(train_x, train_y)
+        acc = model.evaluate(test_x, test_y)
+        print(f'lamb: {lamb} acc: {acc}')

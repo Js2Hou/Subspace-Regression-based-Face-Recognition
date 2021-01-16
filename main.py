@@ -1,4 +1,4 @@
-from model_evaluator import evaluate_on_ExtYaleB
+from model_evaluator import *
 
 if __name__ == '__main__':
-    evaluate_on_ExtYaleB()
+    test2()
