@@ -13,6 +13,9 @@ class LRClassifier:
         """
         self.train_data = train_data
 
+    def prepare_data(self, X):
+        return X
+
     def fit(self):
         pass
 
@@ -20,12 +23,14 @@ class LRClassifier:
         """
         :param test_data: shape like (n_features, n_imgs_per_class, n_classes)
         :return:
-            pred_y: list
+            pred_y: ndarray
                 predicted labels of test dataset
-            true_y: list
+            true_y: ndarray
                 true labels of test dataset
         """
-        train_data = self.train_data
+        train_data = self.prepare_data(self.train_data)
+        test_data = self.prepare_data(test_data)
+
         p, n_per_class, n_class = test_data.shape
         pred_y = []
         true_y = []
@@ -43,7 +48,7 @@ class LRClassifier:
                         id = train_id
                 pred_y.append(id)
                 true_y.append(test_id)
-        return pred_y, true_y
+        return np.array(pred_y), np.array(true_y)
 
     def evaluate(self, test_data):
         """
@@ -53,9 +58,62 @@ class LRClassifier:
                 classification accuracy on test_data
         """
         y_hat, y = self.predict(test_data)
-        n_false = np.count_nonzero(np.array(y_hat) - np.array(y))
+        n_false = np.count_nonzero(y_hat - y)
         acc = 1 - n_false / len(y)
         return acc
+
+
+class RRC2(LRClassifier):
+    def __init__(self, train_data, lamb=0.5):
+        super(RRC2, self).__init__(train_data)
+        self.lamb = lamb
+        pass
+
+    def predict(self, test_data):
+        """
+        :param test_data: shape like (n_features, n_imgs_per_class, n_classes)
+        :return:
+            pred_y: list
+                predicted labels of test dataset
+            true_y: list
+                true labels of test dataset
+        """
+        train_data = self.prepare_data(self.train_data)
+        test_data = self.prepare_data(test_data)
+        n_per_class_train = train_data.shape[1]
+        p, n_per_class_test, n_class = test_data.shape
+        pred_y = []
+        true_y = []
+        for test_id in range(n_class):
+            for ith in range(n_per_class_test):
+                min_dist = 1e10
+                id = -1
+                y = test_data[:, ith, test_id][:, np.newaxis]
+                for train_id in range(n_class):
+                    X = train_data[:, :, train_id]
+                    y_hat = X @ np.linalg.inv(X.T @ X + self.lamb * np.eye(n_per_class_train)) @ X.T @ y
+                    dist = np.linalg.norm(y - y_hat)
+                    if dist < min_dist:
+                        min_dist = dist
+                        id = train_id
+                pred_y.append(id)
+                true_y.append(test_id)
+        return np.array(pred_y), np.array(true_y)
+
+
+class ERRC2(RRC2):
+    def __init__(self, train_data, lamb=0.5, alpha=0.5):
+        super(ERRC2, self).__init__(train_data)
+        self.alpha = alpha
+        self.lamb = lamb
+
+    def prepare_data(self, X):
+        return self.euler(X)
+
+    def euler(self, x):
+        alpha = self.alpha
+        z = (cmath.e ** (1j * alpha * math.pi * x)) / math.sqrt(2)
+        return z
 
 
 class RRClassifier:

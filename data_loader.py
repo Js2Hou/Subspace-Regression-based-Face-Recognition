@@ -1,5 +1,4 @@
 import os
-import glob
 
 import numpy as np
 from scipy.io import loadmat
@@ -29,7 +28,7 @@ class DataLoader:
         # 导入数据
         data = loadmat(path)['DAT']  # (2000, 26, 120)
         # 划分训练集和测试集
-        train_data, test_data = data[:, :13, :], data[:, :13, :]
+        train_data, test_data = data[:, :13, :], data[:, 13:, :]
         if mode == '1' or mode == 1:
             # 制作训练集和测试集：(n_samples, n_features)
             train_x = np.vstack([train_data[:, i, j] for j in range(120) for i in range(13)])

@@ -83,15 +83,3 @@ def evaluate_on_ExtYaleB():
         cur_time = time.strftime("%Y-%m-%d %X", time.localtime())
         with open(r'./results/a.txt', 'a+') as f:
             f.write(f'{cur_time} ERRC-ExtYaleB(condition {i}): {acc3}\n')
-
-
-def test2():
-    # 导入数据
-    train_x, train_y, test_x, test_y = DataLoader.load_AR(mode='1')
-    lambs = [i / 10 for i in range(11)]
-    # 岭回归分类器
-    for lamb in lambs:
-        model = RRClassifier(lamb=lamb, m=120)
-        model.fit(train_x, train_y)
-        acc = model.evaluate(test_x, test_y)
-        print(f'lamb: {lamb} acc: {acc}')
