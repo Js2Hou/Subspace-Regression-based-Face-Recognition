@@ -1,18 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="root@39.106.168.170:6001 key">
+  <component name="PublishConfigData" autoUpload="Always" serverName="root@39.106.168.170:6001 key" showAutoUploadSettingsWarning="false">
     <serverData>
-      <paths name="root@172.26.0.52:22 key">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/Euler-Ridge-Regression" local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="root@39.106.168.170:6001 key">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/nascloud/PycharmProjects/Euler-Ridge-Regression" local="$PROJECT_DIR$" />
+            <mapping deploy="/home/nascloud/PycharmProjects/Euler-Ridge-Regression" local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>
