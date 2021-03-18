@@ -8,6 +8,10 @@ from sklearn.preprocessing import MinMaxScaler
 
 
 class LRClassifier(BaseEstimator, ClassifierMixin):
+    """
+    This is the python implement of LRC(Linear regression for face recognition, Naseem 2010) model.
+    """
+
     def __init__(self):
         self.train_data = None
 
@@ -15,13 +19,19 @@ class LRClassifier(BaseEstimator, ClassifierMixin):
         return X
 
     def fit(self, train_data, y=None):
+        """
+
+        :param train_data: ndarray, shape like (n_features, n_imgs_per_class, n_classes)
+        :param y: None
+        :return: None
+        """
         self.train_data = train_data
         pass
 
     def predict(self, test_data, y=None):
         """
+        :param test_data: ndarray, shape like (n_features, n_imgs_per_class, n_classes)
         :param y: None
-        :param test_data: shape like (n_features, n_imgs_per_class, n_classes)
         :return:
             pred_y: ndarray
                 predicted labels of test dataset
@@ -52,9 +62,9 @@ class LRClassifier(BaseEstimator, ClassifierMixin):
 
     def score(self, X, y=None, sample_weight=None):
         """
-        :param sample_weight:
-        :param y:
         :param X: shape like (n_features, n_imgs_per_class, n_classes)
+        :param y: None
+        :param sample_weight: None
         :return:
             acc: double
                 classification accuracy on test_data
@@ -63,6 +73,11 @@ class LRClassifier(BaseEstimator, ClassifierMixin):
 
 
 class LRC2(BaseEstimator, ClassifierMixin):
+    """
+    This is the python implement of model in paper "Linear regression for face recognition, Naseem 2010".
+    What differs from LRClassifier is that LRC2 take standard dataset like "train_x, train_y" as input.
+    """
+
     def __init__(self):
         self.train_X = None
         self.train_y = None
@@ -72,6 +87,12 @@ class LRC2(BaseEstimator, ClassifierMixin):
         return X
 
     def fit(self, X, y):
+        """
+
+        :param X: ndarray, shape like (n_samples, n_features)
+        :param y: ndarray, shape like (n_samples, )
+        :return: None
+        """
         X = X.copy()
         X = X[np.argsort(y)]
         y = np.sort(y)
@@ -113,9 +134,9 @@ class LRC2(BaseEstimator, ClassifierMixin):
 
     def score(self, X, y, sample_weight=None):
         """
-        :param sample_weight:
-        :param y:
         :param X: shape like (n_samples, n_features)
+        :param y: ndarray, shape like (n_samples, )
+        :param sample_weight: None
         :return:
             acc: classification accuracy on test_data
         """
@@ -124,6 +145,11 @@ class LRC2(BaseEstimator, ClassifierMixin):
 
 
 class RRC2(LRC2):
+    """
+    This is the python implement of RRC(Ridge Regression Classification) model. RRC is a improved model based on
+    paper "Linear regression for face recognition, Naseem 2010". We replace Ridge Regression with Linear Regression.
+    """
+
     def __init__(self, lamb=0.5):
         super().__init__()
         self.lamb = lamb
@@ -134,6 +160,11 @@ class RRC2(LRC2):
 
 
 class ERRC2(LRC2):
+    """
+    This is the python implement of ERRC(Euler Ridge Regression Classification) model. On the basis of RRC, we take
+    euler map as pretreated.
+    """
+
     def __init__(self, lamb, alpha=0.9):
         super().__init__()
         self.lamb = lamb
@@ -150,7 +181,19 @@ class ERRC2(LRC2):
 
 
 class MLRClassifier(LRClassifier):
+    """
+    Modular Approach for the LRC algorithm.
+    """
+
     def __init__(self, H, W, m=3, n=3, threshold_=None):
+        """
+
+        :param H: height of image
+        :param W: width of image
+        :param m: number of division in height
+        :param n: number of division in width
+        :param threshold_: discriminent threshold
+        """
         super(MLRClassifier, self).__init__()
         self.W = W
         self.H = H
@@ -330,7 +373,12 @@ class ERRC2010Real(RRC2010):
         return z
 
 
+# not sure if it works
 class RRC2007(BaseEstimator, ClassifierMixin):
+    """
+    This is the python implement of RRC(Face recognition using kernel ridge regression, cvpr2007) model.
+    """
+
     def __init__(self, m, lamb=0.5):
         self.m = m
         self.lamb = lamb
@@ -377,6 +425,10 @@ class RRC2007(BaseEstimator, ClassifierMixin):
 
 
 class ERRC2007(RRC2007):
+    """
+    This is the python implement of ERRC based RRC2007.
+    """
+
     def __init__(self, m, lamb=0.5, alpha=0.9):
         self.alpha = alpha
         super().__init__(lamb=lamb, m=m)
@@ -567,6 +619,11 @@ class EPCA(ComplexPCA):
 
 
 class MyPCA:
+    """
+    input : (p, a, b)
+    output: (m, a, b)
+    """
+
     def __init__(self, n_components=200, alpha=1.9):
         self.n_components = n_components
         self.pca = EPCA(n_components=n_components, alpha=alpha)
