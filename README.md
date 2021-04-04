@@ -1,4 +1,4 @@
-# Subspace Regression for Face Recognition
+# Subspace Regression based Face Recognition
 
 ## Introduction
 
@@ -51,7 +51,7 @@ This project implement some classic subspace regression for face recognition alg
 
 ## Examples
 
-所有模型都实现在subspace_regression.py中，你可以简单地调用该类中的模型完成人脸识别，下面展示一个简单地例子。
+All models are implemented in subspace_regression.py. You can simply call the models in this class to complete a face recognition task. A simple example is shown below.
 
 ```python
 import numpy as np
@@ -77,7 +77,7 @@ print(f'The accuracy of {model.__class__.__name__} on AR datest is: {acc}.\n')
 
 Thanks to the authors of the papers cited in this project.
 
-## Reference
+## References
 
 [^1] Naseem I, Togneri R, Bennamoun M. Linear regression for face recognition. IEEE Trans Pattern Anal Mach Intell. 2010;32(11):2106-12.
 
