@@ -5,7 +5,14 @@
       <paths name="root@39.106.168.170:6001 key">
         <serverdata>
           <mappings>
-            <mapping deploy="/home/nascloud/PycharmProjects/Euler-Ridge-Regression" local="$PROJECT_DIR$" web="/" />
+            <mapping deploy="/home/nascloud/PycharmProjects/Euler-Ridge-Regression" local="$PROJECT_DIR$" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="root@39.106.168.170:6002 key">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
           </mappings>
         </serverdata>
       </paths>

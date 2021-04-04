@@ -2,21 +2,21 @@ import matplotlib.pyplot as plt
 from sklearn.linear_model import Ridge
 from sklearn.model_selection import GridSearchCV, StratifiedKFold
 
-from data_loader import *
-from models import *
+from dataset import *
+from model.subspace_regression import *
 from utils import *
 
 
-# 测试ERRC_based_LRC基于ExtYaleB数据集
+#  在ExtYaleB数据集上测试特定于类的ERRC
 def test_errc2010_ext():
-    dataset5 = Dataloader.load_ExtYaleB_cropped()
+    dataset5 = ExtYaleB.load_ExtYaleB_20()
     train_data = dataset5[0]
     test_data = dataset5[-1]
     # alphas = [i / 10 for i in range(20)]
     # for alpha in alphas:
     lambs = [i / 100 for i in range(10)]
     for lamb in lambs:
-        model = ERRC2010(lamb=lamb, alpha=0.9)
+        model = ERRC(lamb=lamb, alpha=0.9)
         model.fit(train_data)
         acc = model.score(test_data)
         print(f'lamb: {lamb} acc: {acc}')
@@ -24,13 +24,13 @@ def test_errc2010_ext():
 
 # ERRC2 on extyaleb: 超参数选择lamb
 def select_lamb_errc2_ext():
-    train_x, test_x, train_y, test_y = Dataloader.load_ExtYaleB_cropped2(test_size=0.2, load_ratio=0.5)
+    train_x, test_x, train_y, test_y = ExtYaleB.load_ExtYaleB_cropped_sub123(test_size=0.2, load_ratio=0.5)
     lambs1 = [i / 10 for i in range(1, 10)]
     lambs2 = [2, 3, 4, 5, 6, 7, 8, 9, 10]
     lambs3 = [20, 30, 40, 50, 100]
     lambs = lambs1 + lambs2 + lambs3
 
-    rrc = RRC2()
+    rrc = RRC()
     param_grid = dict(lamb=lambs)  # 转化为字典格式，网络搜索要求
     kflod = StratifiedKFold(n_splits=10, shuffle=True, random_state=7)
     clf = GridSearchCV(rrc, param_grid, scoring='accuracy', n_jobs=-1, cv=kflod)
@@ -38,13 +38,13 @@ def select_lamb_errc2_ext():
     print(f'best para: {clf.best_params_}, best score: {clf.best_score_}')
 
 
-# ERRC2 on extyaleb: 超参数选择alpha
+# ExtYaleB椒盐噪声，特定于类的模型ERRC超参选择(alpha)
 def select_alpha_errc2_ext():
-    train_x, test_x, train_y, test_y = Dataloader.load_ExtYaleB_cropped2(test_size=0.2, load_ratio=0.5)
+    train_x, test_x, train_y, test_y = ExtYaleB.load_ExtYaleB_cropped_sub123(test_size=0.2, load_ratio=0.5)
     test_x = batch_addsalt_pepper(test_x, SNR=0.5)
     alphas = [i / 10 for i in range(1, 20)]
 
-    errc = ERRC2(lamb=0.5)
+    errc = ERRC(lamb=0.5, alpha=1.9)
     param_grid = dict(alpha=alphas)  # 转化为字典格式，网络搜索要求
     kflod = StratifiedKFold(n_splits=5, shuffle=True, random_state=7)
     clf = GridSearchCV(errc, param_grid, scoring='accuracy', n_jobs=-1, cv=kflod)
@@ -67,7 +67,7 @@ def test_diff_ridge_betw_sklearn_mine():
 
 # 椒盐噪声绘图
 def plot_pepper():
-    train_x, test_x, train_y, test_y = Dataloader.load_ExtYaleB_cropped2(test_size=0.3)
+    train_x, test_x, train_y, test_y = ExtYaleB.load_ExtYaleB_cropped_sub123(test_size=0.3)
 
     img0 = test_x[0].reshape(20, 20).T
     img1 = test_x[1].reshape(20, 20).T
